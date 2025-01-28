@@ -114,7 +114,6 @@ def main():
         os.environ["QT_QPA_PLATFORM"] = "windows"
     elif operating_system == "Linux":
         os.environ["QT_QPA_PLATFORM"] = "xcb"
-    print(platform.system())
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
