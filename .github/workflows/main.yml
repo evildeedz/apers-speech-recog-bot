@@ -33,7 +33,7 @@ jobs:
       # Step 4: Build the executable with PyInstaller
       - name: Build executable
         run: |
-          pyinstaller --onefile --collect-submodules=numba main.py
+          pyinstaller --onefile --collect-submodules=numba --add-data "assets" main.py
         shell: cmd
 
       # Step 5: Upload the artifact
