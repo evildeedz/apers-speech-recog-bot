@@ -10,6 +10,7 @@ pkgs.mkShell {
       python-pkgs.pyaudio
       python-pkgs.openai-whisper
       python-pkgs.soundfile
+      python-pkgs.pyinstaller
     ]))
   ];
 }

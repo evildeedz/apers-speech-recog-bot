@@ -1,4 +1,5 @@
 import os
+import platform
 import sys
 
 import pyautogui
@@ -28,12 +29,15 @@ class VoiceRecognitionThread(QThread):
             self.recognizer.adjust_for_ambient_noise(source)
             while self.running:
                 try:
-                    print("Listening for the command 'Next'...")
+                    print("Listening for the command...")
                     audio = self.recognizer.listen(source, timeout=10)
-                    command = self.recognizer.recognize_whisper(audio).lower()
+                    command = self.recognizer.recognize_whisper(
+                        audio,
+                        language="en",
+                    ).lower()
                     print(command)
-                    if "next" in command:
-                        self.command_recognized.emit("Next")
+                    if "next" or "world" or "anyway" or "tafel" in command:
+                        self.command_recognized.emit(command)
                         pyautogui.press("space")
                     else:
                         self.command_recognized.emit(f"Unrecognized command: {command}")
@@ -105,7 +109,12 @@ class MainWindow(QMainWindow):
 
 
 def main():
-    os.environ["QT_QPA_PLATFORM"] = "xcb"
+    operating_system = platform.system()
+    if operating_system == "Windows":
+        os.environ["QT_QPA_PLATFORM"] = "windows"
+    elif operating_system == "Linux":
+        os.environ["QT_QPA_PLATFORM"] = "xcb"
+    print(platform.system())
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
