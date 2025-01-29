@@ -1,6 +1,7 @@
 import os
 import platform
 import sys
+import whisper
 
 import pyautogui
 import speech_recognition as sr
