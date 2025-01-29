@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller pyaudio pyautogui pyqt6 speechrecognition openai-whisper soundfile ffmpeg setuptools-rust
+          pip install pyinstaller pyaudio pyautogui pyqt6 speechrecognition openai-whisper soundfile
 
        # Step 4: Get Whisper's installed path dynamically
       - name: Find Whisper Path
