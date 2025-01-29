@@ -40,7 +40,7 @@ jobs:
       # Step 5: Build the executable with PyInstaller
       - name: Build executable
         run: |
-          pyinstaller --noconfirm --onedir --windowed --collect-submodules=numba --recursive-copy-metadata="openai-whisper" --add-data="$WHISPER_PATH;whisper/" main.py
+          pyinstaller --noconfirm --onedir --windowed --collect-submodules=numba --recursive-copy-metadata="openai-whisper" --add-data="%WHISPER_PATH%;whisper/" main.py
         shell: cmd
 
       # Step 6: Upload the artifact
