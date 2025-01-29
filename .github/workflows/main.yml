@@ -30,15 +30,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller pyaudio pyautogui pyqt6 speechrecognition openai-whisper soundfile ffmpeg setuptools-rust
 
-      # Step 4: Build the executable with PyInstaller
+       # Step 4: Get Whisper's installed path dynamically
+      - name: Find Whisper Path
+        id: whisper_path
+        run: |
+          echo "WHISPER_PATH=$(python -c 'import whisper, os; print(os.path.dirname(whisper.__file__))')" >> $GITHUB_ENV
+        shell: bash
+
+      # Step 5: Build the executable with PyInstaller
       - name: Build executable
         run: |
-          pyinstaller --collect-submodules=numba --recursive-copy-metadata="openai-whisper" main.py
+          pyinstaller --noconfirm --onedir --windowed --collect-submodules=numba --recursive-copy-metadata="openai-whisper" --add-data="$WHISPER_PATH;whisper/" main.py
         shell: cmd
 
-      # Step 5: Upload the artifact
+      # Step 6: Upload the artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: windows-build
-          path: dist/main.exe
+          path: dist/
