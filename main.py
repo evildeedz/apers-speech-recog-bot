@@ -37,7 +37,7 @@ class VoiceRecognitionThread(QThread):
                         language="en",
                     ).lower()
                     print(command)
-                    if "next" or "world" or "anyway" or "tafel" in command:
+                    if any(word in command for word in ["next", "world", "anyway", "tafel"]):
                         self.command_recognized.emit(command)
                         pyautogui.press("space")
                     else:
