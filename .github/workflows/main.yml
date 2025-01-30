@@ -13,6 +13,10 @@ jobs:
     name: Build on Windows
     runs-on: windows-latest
 
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}  # Using GitHub Secrets
+      APP_MODE: "production"  # Example custom environment variable
+    
     steps:
       # Step 1: Checkout the code
       - name: Checkout code
