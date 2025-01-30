@@ -1,10 +1,10 @@
 import os
 import platform
 import sys
-import whisper
 
 import pyautogui
 import speech_recognition as sr
+from dotenv import load_dotenv
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtWidgets import (
     QApplication,
@@ -14,6 +14,8 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+
+load_dotenv()
 
 
 class VoiceRecognitionThread(QThread):
@@ -31,17 +33,21 @@ class VoiceRecognitionThread(QThread):
             while self.running:
                 try:
                     print("Listening for the command...")
-                    audio = self.recognizer.listen(source, timeout=10)
-                    command = self.recognizer.recognize_whisper(
+                    audio = self.recognizer.listen(source)
+                    command = self.recognizer.recognize_openai(
                         audio,
                         language="en",
                     ).lower()
                     print(command)
-                    if any(word in command for word in ["next", "world", "anyway", "tafel"]):
-                        self.command_recognized.emit(command)
-                        pyautogui.press("space")
-                    else:
-                        self.command_recognized.emit(f"Unrecognized command: {command}")
+                    words = command.split()
+                    for word in words:
+                        if word in ["next", "world", "anyway", "tafel"]:
+                            self.command_recognized.emit(command)
+                            pyautogui.press("space")
+                        else:
+                            self.command_recognized.emit(
+                                f"Unrecognized command: {command}"
+                            )
                 except sr.UnknownValueError:
                     self.command_recognized.emit(
                         "Sorry, I couldn't understand the audio."
