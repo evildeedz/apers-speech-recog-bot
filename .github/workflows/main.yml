@@ -35,19 +35,19 @@ jobs:
           pip install pyinstaller pyaudio pyautogui pyqt6 speechrecognition openai httpx soundfile python-dotenv
         #pip install pyinstaller pyaudio pyautogui pyqt6 speechrecognition openai-whisper soundfile
 
-       # Step 4: Get Whisper's installed path dynamically
-       # - name: Find Whisper Path
-       # id: whisper_path
-       # run: |
-       # echo "WHISPER_PATH=$(python -c 'import whisper, os; print(os.path.dirname(whisper.__file__))')" >> $GITHUB_ENV
-       # shell: bash
+      # Step 4: Get Whisper's installed path dynamically
+      # - name: Find Whisper Path
+      # id: whisper_path
+      # run: |
+      # echo "WHISPER_PATH=$(python -c 'import whisper, os; print(os.path.dirname(whisper.__file__))')" >> $GITHUB_ENV
+      # shell: bash
 
       # Step 5: Build the executable with PyInstaller
+      # pyinstaller --noconfirm --onedir --windowed --collect-submodules=numba --recursive-copy-metadata="openai-whisper" --add-data="%WHISPER_PATH%;whisper/" main.py
       - name: Build executable
         run: |
           pyinstaller --noconfirm --onedir --windowed --collect-submodules=numba main.py
       
-          # pyinstaller --noconfirm --onedir --windowed --collect-submodules=numba --recursive-copy-metadata="openai-whisper" --add-data="%WHISPER_PATH%;whisper/" main.py
         shell: cmd
 
       # Step 6: Upload the artifact
