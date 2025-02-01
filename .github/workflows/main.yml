@@ -55,7 +55,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          pyinstaller --noconfirm --onedir --collect-submodules=numba --hidden-import=openai main.py
+          pyinstaller --noconfirm --onedir --collect-submodules=numba main.py
       
         shell: cmd
 
