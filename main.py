@@ -17,12 +17,12 @@ from PyQt6.QtWidgets import (
 
 # Get API key
 load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
+#api_key = os.getenv("OPENAI_API_KEY")
 
-if not api_key:
-    raise ValueError("API key not found. Make sure OPENAI_API_KEY is set.")
+#if not api_key:
+#    raise ValueError("API key not found. Make sure OPENAI_API_KEY is set.")
 
-openai.api_key = api_key
+openai.api_key = "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"
 
 class VoiceRecognitionThread(QThread):
     command_recognized = pyqtSignal(str)
