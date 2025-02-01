@@ -46,7 +46,7 @@ jobs:
       # pyinstaller --noconfirm --onedir --windowed --collect-submodules=numba --recursive-copy-metadata="openai-whisper" --add-data="%WHISPER_PATH%;whisper/" main.py
       - name: Build executable
         run: |
-          pyinstaller --noconfirm --onedir --windowed --collect-submodules=numba main.py
+          pyinstaller --noconfirm --onedir --collect-submodules=numba main.py
       
         shell: cmd
 
