@@ -16,16 +16,7 @@ from PyQt6.QtWidgets import (
 )
 
 # Get API key
-extDataDir = os.getcwd()
-if getattr(sys, 'frozen', False):
-    extDataDir = sys._MEIPASS
-load_dotenv(dotenv_path=os.path.join(extDataDir, '.env'))
-api_key = os.getenv("OPENAI_API_KEY")
-
-if not api_key:
-   raise ValueError("API key not found. Make sure OPENAI_API_KEY is set.")
-
-openai.api_key = api_key
+load_dotenv()
 
 class VoiceRecognitionThread(QThread):
     command_recognized = pyqtSignal(str)
