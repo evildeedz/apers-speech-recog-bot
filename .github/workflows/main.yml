@@ -18,6 +18,13 @@ jobs:
       APP_MODE: "production"  # Example custom environment variable
     
     steps:
+      - name: Debug Environment Variables
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          echo "Checking if OPENAI_API_KEY is set"
+          echo "API Key length: ${#OPENAI_API_KEY}"
+        shell: bash
       # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v4
@@ -45,8 +52,10 @@ jobs:
       # Step 5: Build the executable with PyInstaller
       # pyinstaller --noconfirm --onedir --windowed --collect-submodules=numba --recursive-copy-metadata="openai-whisper" --add-data="%WHISPER_PATH%;whisper/" main.py
       - name: Build executable
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          pyinstaller --noconfirm --onedir --collect-submodules=numba main.py
+          pyinstaller --noconfirm --onedir --collect-submodules=numba --hidden-import=openai main.py
       
         shell: cmd
 
