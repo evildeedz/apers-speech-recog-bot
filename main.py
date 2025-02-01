@@ -16,7 +16,10 @@ from PyQt6.QtWidgets import (
 )
 
 # Get API key
-load_dotenv()
+extDataDir = os.getcwd()
+if getattr(sys, 'frozen', False):
+    extDataDir = sys._MEIPASS
+load_dotenv(dotenv_path=os.path.join(extDataDir, '.env'))
 
 class VoiceRecognitionThread(QThread):
     command_recognized = pyqtSignal(str)
