@@ -49,13 +49,21 @@ jobs:
       # echo "WHISPER_PATH=$(python -c 'import whisper, os; print(os.path.dirname(whisper.__file__))')" >> $GITHUB_ENV
       # shell: bash
 
+      # Step 4: Create Env
+      - name: Create .env File
+        run: |
+          echo "OPENAI_API_KEY=${OPENAI_API_KEY}" > .env
+        shell: bash
+
       # Step 5: Build the executable with PyInstaller
       # pyinstaller --noconfirm --onedir --windowed --collect-submodules=numba --recursive-copy-metadata="openai-whisper" --add-data="%WHISPER_PATH%;whisper/" main.py
       - name: Build executable
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          pyinstaller --noconfirm --onedir --collect-submodules=numba main.py
+          pyinstaller --noconfirm --onedir \
+            --add-data ".env;.env" \
+            --collect-submodules=numba main.py
       
         shell: cmd
 
