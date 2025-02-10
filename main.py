@@ -4,7 +4,7 @@ import sys
 
 import pyautogui
 import speech_recognition as sr
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtWidgets import (
     QApplication,
@@ -16,10 +16,12 @@ from PyQt6.QtWidgets import (
 )
 
 # Get API key
-extDataDir = os.getcwd()
-if getattr(sys, 'frozen', False):
-    extDataDir = sys._MEIPASS
-load_dotenv(dotenv_path=os.path.join(extDataDir, '.env'))
+# extDataDir = os.getcwd()
+# if getattr(sys, 'frozen', False):
+#     extDataDir = sys._MEIPASS
+# load_dotenv(dotenv_path=os.path.join(extDataDir, '.env'))
+
+api_key = os.getenv("OPENAI_API_KEY")
 
 class VoiceRecognitionThread(QThread):
     command_recognized = pyqtSignal(str)
