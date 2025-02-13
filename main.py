@@ -1,10 +1,10 @@
 import os
 import platform
 import sys
+import whisper
 
 import pyautogui
 import speech_recognition as sr
-from dotenv import load_dotenv
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtWidgets import (
     QApplication,
@@ -15,13 +15,6 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-# Get API key
-extDataDir = os.getcwd()
-if getattr(sys, 'frozen', False):
-    extDataDir = sys._MEIPASS
-load_dotenv(dotenv_path=os.path.join(extDataDir, '.env'))
-
-# api_key = os.getenv("OPENAI_API_KEY")
 
 class VoiceRecognitionThread(QThread):
     command_recognized = pyqtSignal(str)
@@ -30,50 +23,35 @@ class VoiceRecognitionThread(QThread):
         super().__init__()
         self.running = False
         self.recognizer = sr.Recognizer()
-        # Adjust this to tweak chunk length in seconds
-        self.phrase_time_limit = 1
 
     def run(self):
         self.running = True
         with sr.Microphone() as source:
-            # Optional: reduce background noise
             self.recognizer.adjust_for_ambient_noise(source)
             while self.running:
                 try:
-                    print("Listening for a short chunk...")
-                    # Capture a short chunk of audio
-                    audio = self.recognizer.listen(
-                        source, phrase_time_limit=self.phrase_time_limit
-                    )
-
-                    # Recognize chunk with OpenAI
-                    command = self.recognizer.recognize_openai(
-                        audio, language="en"
+                    print("Listening for the command...")
+                    audio = self.recognizer.listen(source, timeout=10, phrase_time_limit=1)
+                    command = self.recognizer.recognize_whisper(
+                        audio,
+                        language="en",
                     ).lower()
-
-                    print("Heard chunk:", command)
-
-                    # Check for trigger words
-                    triggered = False
-                    for word in command.split():
-                        if word in ["next", "world", "anyway", "tafel"]:
-                            triggered = True
-                            break
-
-                    if triggered:
-                        self.command_recognized.emit(f"Triggered command: {command}")
+                    print(command)
+                    if any(word in command for word in ["next", "world", "anyway", "tafel"]):
+                        self.command_recognized.emit(command)
                         pyautogui.press("space")
                     else:
-                        self.command_recognized.emit(f"Chunk recognized: {command}")
-
-                except sr.WaitTimeoutError:
-                    self.command_recognized.emit("...silence...")
-                    continue
+                        self.command_recognized.emit(f"Unrecognized command: {command}")
                 except sr.UnknownValueError:
-                    self.command_recognized.emit("Could not understand (chunk).")
-                except sr.RequestError as e:
-                    self.command_recognized.emit(f"API unavailable/error: {e}")
-                # Loop continues for the next chunk
+                    self.command_recognized.emit(
+                        "Sorry, I couldn't understand the audio."
+                    )
+                except sr.RequestError:
+                    self.command_recognized.emit(
+                        "Speech recognition service is unavailable."
+                    )
+                except sr.WaitTimeoutError:
+                    self.command_recognized.emit("Listening timed out.")
 
     def stop(self):
         self.running = False
@@ -84,27 +62,34 @@ class VoiceRecognitionThread(QThread):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Chunked Live-ish Recognition")
+
+        self.setWindowTitle("Voice-Controlled Spacebar")
         self.setGeometry(100, 100, 400, 200)
 
+        # Main layout
         self.layout = QVBoxLayout()
-        self.status_label = QLabel("Click 'Start' to begin listening.")
+
+        # Status label
+        self.status_label = QLabel("Status: Click 'Start' to begin listening")
         self.layout.addWidget(self.status_label)
 
+        # Start button
         self.start_button = QPushButton("Start Listening")
         self.start_button.clicked.connect(self.start_listening)
         self.layout.addWidget(self.start_button)
 
+        # Stop button
         self.stop_button = QPushButton("Stop Listening")
         self.stop_button.clicked.connect(self.stop_listening)
         self.stop_button.setEnabled(False)
         self.layout.addWidget(self.stop_button)
 
+        # Set central widget
         container = QWidget()
         container.setLayout(self.layout)
         self.setCentralWidget(container)
 
-        # Thread
+        # Voice recognition thread
         self.voice_thread = VoiceRecognitionThread()
         self.voice_thread.command_recognized.connect(self.update_status)
 
@@ -112,24 +97,24 @@ class MainWindow(QMainWindow):
         self.voice_thread.start()
         self.start_button.setEnabled(False)
         self.stop_button.setEnabled(True)
-        self.status_label.setText("Listening in short chunks...")
+        self.status_label.setText("Status: Listening...")
 
     def stop_listening(self):
         self.voice_thread.stop()
         self.start_button.setEnabled(True)
         self.stop_button.setEnabled(False)
-        self.status_label.setText("Stopped listening")
+        self.status_label.setText("Status: Stopped listening")
 
     def update_status(self, message):
         self.status_label.setText(f"Status: {message}")
 
 
 def main():
-    if platform.system() == "Windows":
+    operating_system = platform.system()
+    if operating_system == "Windows":
         os.environ["QT_QPA_PLATFORM"] = "windows"
-    elif platform.system() == "Linux":
+    elif operating_system == "Linux":
         os.environ["QT_QPA_PLATFORM"] = "xcb"
-
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
